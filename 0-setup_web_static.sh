@@ -21,6 +21,7 @@ install_if_not_exist nginx
 
 # Start Nginx service
 service nginx start
+
 # create necessary folders
 mkdir -p /data/web_static/releases/test/ /data/web_static/shared/
 
@@ -34,12 +35,11 @@ echo 'Hello World!' > /var/www/html/index.html
 echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
 
 # create fake html for testing
-echo "
-<html>
+echo "<html>
   <head>
   </head>
   <body>
-    Holberton School
+    Finally! Some Success!!
   </body>
 </html>" > /data/web_static/releases/test/index.html
 
@@ -60,8 +60,8 @@ echo "server {
 	root /var/www/html;
     index index.html index.htm;
 
-    location = /hbnb_static/ {
-        alias data/web_static/current/;
+    location /hbnb_static/ {
+        alias /data/web_static/current/;
     }
 
     error_page 404 /custom_404.html;
