@@ -10,3 +10,6 @@ file.json
 venv
 main_place_amenities.py
 myenv
+.gitignore
+test.py
+*static2.py
