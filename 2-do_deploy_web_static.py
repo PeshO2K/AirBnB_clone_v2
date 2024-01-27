@@ -29,7 +29,7 @@ def do_deploy(archive_path):
 
     try:
         # Upload the archive to the /tmp/ directory of the web server
-        put(archive_path, remote_archive_path)
+        put(archive_path, '/tmp/')
 
         # Define the target extraction directory on the web server
         target_extraction_path = f"/data/web_static/releases/{folder_name}"
@@ -54,5 +54,6 @@ def do_deploy(archive_path):
 
         return True
 
-    except Exception:
+    except Exception as e:
+        print(e)
         return False
