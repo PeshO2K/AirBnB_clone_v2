@@ -11,6 +11,7 @@ env.user = "ubuntu"
 env.key_filename = "~/.ssh/my_school"
 env.hosts = ['18.204.14.158', '54.82.197.53']
 
+
 def do_pack():
     """Creates a .tgz archive from the contents of the web_static folder.
     """
@@ -30,6 +31,7 @@ def do_pack():
         return None
     return path.join("versions", archive_name)
 
+
 def do_deploy(archive_path):
     """
     Distributes an archive to web servers
@@ -38,7 +40,7 @@ def do_deploy(archive_path):
         archive_path (str): Path to the archive file
 
     Returns:
-        True if all operations have been done correctly, otherwise returns False
+        True on success, otherwise returns False
     """
     # Check if the archive file exists
     if not path.exists(archive_path):
@@ -73,12 +75,14 @@ def do_deploy(archive_path):
         # Create a new symbolic link linked to the extracted version
         run("ln -s {}/ {}"
             .format(target_extraction_path, symlink))
+        print("New version deployed")
 
         return True
 
     except Exception as e:
         print(e)
         return False
+
 
 def deploy():
     """stack and deploy"""
