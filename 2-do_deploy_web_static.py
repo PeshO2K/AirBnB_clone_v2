@@ -12,42 +12,30 @@ env.key_filename = "~/.ssh/my_school"
 env.hosts = ['18.204.14.158', '54.82.197.53']
 
 
+
+
 def do_deploy(archive_path):
-    """Function distributes an archive to my web servers."""
-    if not os.path.exists(archive_path):
-        return False
-
+    """ method doc
+        fab -f 2-do_deploy_web_static.py do_deploy:
+        archive_path=versions/web_static_20231004201306.tgz
+        -i ~/.ssh/id_rsa -u ubuntu
+    """
     try:
-        # Extracting directory and file information
-        path_split = os.path.splitext(os.path.basename(archive_path))
-        no_extension = path_split[0]
-        folder = '/data/web_static/releases/{}/'.format(no_extension)
-
-        # Upload the archive to /tmp/
-        put(archive_path, '/tmp/')
-
-        # Create the release directory
-        run('mkdir -p {}'.format(folder))
-
-        # Extract the contents of the archive into the release directory
-        run('tar -xzf /tmp/{} -C {}/'.format(
-            os.path.basename(archive_path), folder))
-
-        # Remove the uploaded archive from /tmp/
-        run('rm /tmp/{}'.format(os.path.basename(archive_path)))
-
-        # Move the contents of web_static to the release directory
-        run('mv {}/web_static/* {}'.format(folder, folder))
-
-        # Remove the now empty web_static directory
-        run('rm -rf {}/web_static'.format(folder))
-
-        # Update the symbolic link to the new release
-        current = '/data/web_static/current'
-        run('rm -rf {}'.format(current))
-        run('ln -s {}/ {}'.format(folder, current))
-
+        if not os.path.exists(archive_path):
+            return False
+        fn_with_ext = os.path.basename(archive_path)
+        fn_no_ext, ext = os.path.splitext(fn_with_ext)
+        dpath = "/data/web_static/releases/"
+        put(archive_path, "/tmp/")
+        run("rm -rf {}{}/".format(dpath, fn_no_ext))
+        run("mkdir -p {}{}/".format(dpath, fn_no_ext))
+        run("tar -xzf /tmp/{} -C {}{}/".format(fn_with_ext, dpath, fn_no_ext))
+        run("rm /tmp/{}".format(fn_with_ext))
+        run("mv {0}{1}/web_static/* {0}{1}/".format(dpath, fn_no_ext))
+        run("rm -rf {}{}/web_static".format(dpath, fn_no_ext))
+        run("rm -rf /data/web_static/current")
+        run("ln -s {}{}/ /data/web_static/current".format(dpath, fn_no_ext))
+        print("New version deployed!")
         return True
-    except Exception as e:
-        print(f"Error: {e}")
+    except Exception:
         return False
