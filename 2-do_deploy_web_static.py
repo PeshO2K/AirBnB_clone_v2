@@ -11,80 +11,43 @@ env.user = "ubuntu"
 env.key_filename = "~/.ssh/my_school"
 env.hosts = ['18.204.14.158', '54.82.197.53']
 
-# def do_deploy(archive_path):
-#     """
-#     Distributes an archive to web servers
-
-#     Args:
-#         archive_path (str): Path to the archive file
-
-#     Returns:
-#         True if all operations ha
-#            ve been done correctly, otherwise returns False
-#     """
-#     # Check if the archive file exists
-#     if not path.exists(archive_path):
-#         return False
-
-#     # Extract information from the archive path
-#     archive_filename = path.basename(archive_path)
-#     folder_name = path.splitext(archive_filename)[0]
-#     remote_archive_path = f"/tmp/{archive_filename}"
-
-#     try:
-#         # Upload the archive to the /tmp/ directory of the web server
-#         put(archive_path, '/tmp/')
-
-#         # Define the target extraction directory on the web server
-#         target_extraction_path = f"/data/web_static/releases/{folder_name}"
-
-#         # Create the target directory on the web server
-#         run("mkdir -p {}".format(target_extraction_path))
-
-#         # Extract the archive, stripping the top-level directory
-#         run("tar -xzf {} -C {} --strip-components=1"
-#             .format(remote_archive_path, target_extraction_path))
-
-#         # Delete the uploaded archive from the web server
-#         run("rm -f {}".format(remote_archive_path))
-
-#         # Remove the previous symbolic link
-#         symlink = "/data/web_static/current"
-#         run(f"rm -rf {symlink}")
-
-#         # Create a new symbolic link linked to the extracted version
-#         run("ln -s {}/ {}"
-#             .format(target_extraction_path, symlink))
-
-#         return True
-
-#     except Exception as e:
-#         print(e)
-#         return False
-
 
 def do_deploy(archive_path):
-    """
-    distributes an archive to your web servers
-    """
-    # verificamos si el path existe
-    if os.path.exists(archive_path) is False:
-        return(False)
+    """Function distributes an archive to my web servers."""
+    if not os.path.exists(archive_path):
+        return False
+
     try:
+        # Extracting directory and file information
+        path_split = os.path.splitext(os.path.basename(archive_path))
+        no_extension = path_split[0]
+        folder = '/data/web_static/releases/{}/'.format(no_extension)
+
+        # Upload the archive to /tmp/
         put(archive_path, '/tmp/')
-        _filename = archive_path.split("/")[-1]
-        filename = _filename.split(".")[0]
-        run('mkdir -p /data/web_static/releases/{}'.format(filename))
-        run('tar -xzf /tmp/{} -C /data/web_static/releases/{}'.format
-            (_filename, filename))
-        run('rm /tmp/{}'.format(_filename))
-        run('mv -u /data/web_static/releases/{}/web_static/* \
-            /data/web_static/releases/{}/'.format(filename, filename))
-        run('rm -rf /data/web_static/releases/{}/web_static'
-            .format(filename))
-        run('rm -rf /data/web_static/current')
-        run('ln -s /data/web_static/releases/{} /data/web_static/current'
-            .format(filename))
-        return(True)
-    except Exception:
-        return(False)
+
+        # Create the release directory
+        run('mkdir -p {}'.format(folder))
+
+        # Extract the contents of the archive into the release directory
+        run('tar -xzf /tmp/{} -C {}/'.format(
+            os.path.basename(archive_path), folder))
+
+        # Remove the uploaded archive from /tmp/
+        run('rm /tmp/{}'.format(os.path.basename(archive_path)))
+
+        # Move the contents of web_static to the release directory
+        run('mv {}/web_static/* {}'.format(folder, folder))
+
+        # Remove the now empty web_static directory
+        run('rm -rf {}/web_static'.format(folder))
+
+        # Update the symbolic link to the new release
+        current = '/data/web_static/current'
+        run('rm -rf {}'.format(current))
+        run('ln -s {}/ {}'.format(folder, current))
+
+        return True
+    except Exception as e:
+        print(f"Error: {e}")
+        return False
