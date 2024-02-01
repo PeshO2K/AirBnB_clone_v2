@@ -13,3 +13,4 @@ myenv
 .gitignore
 test.py
 *static2.py
+*static copy*
