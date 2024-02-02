@@ -10,28 +10,15 @@ def do_pack():
     """Creates a .tgz archive from the contents of the web_static folder.
     """
     # Create the versions folder if it doesn't exist
-    local("mkdir -p versions")
+    local("mkdir -p versions", capture=True)
     # Generate timestamp for the archive name
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     # Create the archive file name
     archive_path_name = f"versions/web_static_{timestamp}.tgz"
+    print(f"Packing web_static to {archive_path_name}")
     # Compress the web_static folder into the archive
-    exit_code = local(f"tar -cvzf {archive_path_name} web_static",
-                      capture=True)
-    if exit_code.return_code:
+    exit_code = local(f"tar -cvzf {archive_path_name} web_static")
+    if exit_code.failed:
         return None
+    print("web_static packed: {} -> {}Bytes".format(archive_path_name, os.path.getsize(archive_path_name)))
     return archive_path_name
-
-    try:
-        now = datetime.now().strftime("%Y%m%d%H%M%S")
-        archive_name = "versions/web_static_{}.tgz".format(now)
-
-        local("mkdir -p versions")
-        local("tar -cvzf {} web_static".format(archive_name))
-
-        print("web_static packed: {} -> {}Bytes".format(archive_name, os.path.getsize(archive_name)))
-
-        return archive_name
-    except Exception as e:
-        print(e)
-        return None
