@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Module Documentation: Flask web application with storage engine integration.
+Flask web application with storage engine integration.
 """
 
 from flask import Flask, render_template
@@ -12,7 +12,7 @@ app = Flask(__name__)
 @app.teardown_appcontext
 def close_storage(exception):
     """
-    Function Documentation: Close the storage session after each request.
+    Close the storage session after each request.
     """
     storage.close()
 
@@ -21,16 +21,18 @@ def close_storage(exception):
 @app.route('/states/<id>', strict_slashes=False)
 def states(id=None):
     """
-    Function Documentation: Route handler for /states and /states/<id>.
+    Route handler for /states and /states/<id>.
     """
     states = storage.all(State).values()
+    filtered = False
 
     if id:
         # filter state matching id
-        state = next((state for state in states if state.id == id), None)
-        return render_template('9-states.html', states=state, filtered=True)
+        states = next((state for state in states if state.id == id), None)
+        filtered = True
+        # return render_template('9-states.html', states=state, filtered=True)
 
-    return render_template('9-states.html', states=states, filtered=False)
+    return render_template('9-states.html', states=states, filtered=filtered)
 
 
 if __name__ == "__main__":
