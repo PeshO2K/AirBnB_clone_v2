@@ -30,7 +30,6 @@ def states(id=None):
         # filter state matching id
         states = next((state for state in states if state.id == id), None)
         filtered = True
-        # return render_template('9-states.html', states=state, filtered=True)
 
     return render_template('9-states.html', states=states, filtered=filtered)
 
