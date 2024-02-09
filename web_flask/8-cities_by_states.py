@@ -23,9 +23,8 @@ def cities_by_states():
     Function Documentation: Route handler for /cities_by_states.
     """
     states = storage.all(State).values()
-    sorted_states = sorted(states, key=lambda state: state.name)
 
-    return render_template('8-cities_by_states.html', states=sorted_states)
+    return render_template('8-cities_by_states.html', states=states)
 
 
 if __name__ == "__main__":
